@@ -4,6 +4,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const TARGET = "https://anikai.to";
 
+const ALLOWED_ORIGINS = ["https://www.anizen.site", "http://localhost:5173"];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "*");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
+
 const HEADERS = {
   "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
   "Accept-Language": "en-US,en;q=0.9",
