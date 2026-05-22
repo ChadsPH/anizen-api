@@ -60,6 +60,10 @@ async function getSession() {
   return cachedCookie;
 }
 
+function looksLikeHtml(str) {
+  return typeof str === "string" && str.trimStart().startsWith("<");
+}
+
 // Warm up session on start
 getSession();
 
@@ -92,19 +96,27 @@ app.all("/anikai/*", async (req, res) => {
   try {
     const upstream = await fetch(url, { method: req.method, headers, redirect: "follow" });
 
-    // If AJAX returns HTML, session is stale — refresh and retry once
     if (isAjax && upstream.status === 200) {
       const text = await upstream.text();
-      let parsed = null;
-      try { parsed = JSON.parse(text); } catch {}
 
-      if (typeof parsed?.result === "string" && parsed.result.trimStart().startsWith("<!DOCTYPE")) {
+      // Stale session: raw HTML body OR JSON envelope where result is HTML
+      let isStale = looksLikeHtml(text);
+      if (!isStale) {
+        try {
+          const parsed = JSON.parse(text);
+          isStale = looksLikeHtml(parsed?.result);
+        } catch {}
+      }
+
+      if (isStale) {
         console.warn("[proxy] stale session detected, refreshing...");
         cachedCookie = null;
         const fresh = await getSession();
         headers.Cookie = fresh;
         const retry = await fetch(url, { method: req.method, headers, redirect: "follow" });
         res.status(retry.status);
+        const ct = retry.headers.get("content-type");
+        if (ct) res.setHeader("Content-Type", ct);
         return res.send(Buffer.from(await retry.arrayBuffer()));
       }
 
