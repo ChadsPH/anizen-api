@@ -4,7 +4,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const TARGET = "https://anikai.to";
 
-const ALLOWED_ORIGINS = ["https://www.anizen.site", "http://localhost:5173"];
+const ALLOWED_ORIGINS = ["https://www.anizen.site", "https://anizen.site"];
 
 app.use((req, res, next) => {
   const origin = req.headers.origin;
