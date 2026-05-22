@@ -4,13 +4,9 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const TARGET = "https://anikai.to";
 
-const ALLOWED_ORIGINS = ["https://www.anizen.site", "https://anizen.site"];
-
+// CORS
 app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (ALLOWED_ORIGINS.includes(origin)) {
-    res.setHeader("Access-Control-Allow-Origin", origin);
-  }
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "*");
   if (req.method === "OPTIONS") return res.sendStatus(204);
@@ -66,15 +62,6 @@ async function getSession() {
 
 // Warm up session on start
 getSession();
-
-// CORS
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "*");
-  if (req.method === "OPTIONS") return res.sendStatus(204);
-  next();
-});
 
 // Health check
 app.get("/", (req, res) => res.json({ status: "ok", proxy: "anizen → anikai.to" }));
