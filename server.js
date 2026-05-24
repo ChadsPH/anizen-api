@@ -2,7 +2,7 @@ import express from "express";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const TARGET = "https://anikai.to";
+const TARGET = "https://anikototv.to";
 
 // CORS
 app.use((req, res, next) => {
@@ -21,10 +21,10 @@ const HEADERS = {
   "sec-ch-ua": '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
   "sec-ch-ua-mobile": "?0",
   "sec-ch-ua-platform": '"Windows"',
-  "Cookie": process.env.ANIKAI_COOKIE || "__p_mov=1; usertype=guest; session=vLrU4aKItp0QltI2asH83yugyWDsSSQtyl9sxWKO",
+  "Cookie": process.env.anikototv_COOKIE || "__p_mov=1; usertype=guest; session=vLrU4aKItp0QltI2asH83yugyWDsSSQtyl9sxWKO",
 };
 
-// Cache session fetched from anikai.to/home
+// Cache session fetched from anikototv.to/home
 let cachedCookie = null;
 let cacheTime = 0;
 const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
@@ -32,7 +32,7 @@ const CACHE_TTL = 30 * 60 * 1000; // 30 minutes
 async function getSession() {
   if (cachedCookie && Date.now() - cacheTime < CACHE_TTL) return cachedCookie;
 
-  console.log("[proxy] fetching fresh session from anikai.to...");
+  console.log("[proxy] fetching fresh session from anikototv.to...");
   try {
     const res = await fetch(`${TARGET}/home`, {
       headers: { ...HEADERS, Accept: "text/html" },
@@ -68,11 +68,11 @@ function looksLikeHtml(str) {
 getSession();
 
 // Health check
-app.get("/", (req, res) => res.json({ status: "ok", proxy: "anizen → anikai.to" }));
+app.get("/", (req, res) => res.json({ status: "ok", proxy: "anizen → anikototv.to" }));
 
-// Proxy all /anikai/* → anikai.to/*
-app.all("/anikai/*", async (req, res) => {
-  const path = req.path.replace(/^\/anikai/, "");
+// Proxy all /anikototv/* → anikototv.to/*
+app.all("/anikototv/*", async (req, res) => {
+  const path = req.path.replace(/^\/anikototv/, "");
   const qs = new URLSearchParams(req.query).toString();
   const url = `${TARGET}${path}${qs ? "?" + qs : ""}`;
   const isAjax = path.includes("/ajax/");
