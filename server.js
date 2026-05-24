@@ -71,8 +71,8 @@ getSession();
 app.get("/", (req, res) => res.json({ status: "ok", proxy: "anizen → anikototv.to" }));
 
 // Proxy all /anikototv/* → anikototv.to/*
-app.all("/anikototv/*", async (req, res) => {
-  const path = req.path.replace(/^\/anikototv/, "");
+app.all("/anikai/*", async (req, res) => {
+  const path = req.path.replace(/^\/anikai/, "");
   const qs = new URLSearchParams(req.query).toString();
   const url = `${TARGET}${path}${qs ? "?" + qs : ""}`;
   const isAjax = path.includes("/ajax/");
